@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEOD Technologies — Universal Client Onboarding & Discovery</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+/* ============================================================
+   AEOD TECHNOLOGIES — CLIENT ONBOARDING SYSTEM
+   Brand: Navy #0A1C35 · Sapphire #1558A8 · Sky #3BA8F0
+   Typography: Barlow Condensed (display) · Barlow (body)
+   Version: 2.0 · 2026
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:    #0A1C35;
+  --sapphire:#1558A8;
+  --sky:     #3BA8F0;
+  --mist:    #D6E8F8;
+  --cloud:   #F4F7FB;
+  --ink:     #060E1A;
+  --slate:   #8FA5C0;
+  --rule:    #DDE3EC;
+  --white:   #ffffff;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: #EAEEF4;
+  color: var(--navy);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px 80px;
+}
+
+/* ── PAGE WRAPPER ── */
+.page-wrap {
+  width: 100%;
+  max-width: 680px;
+}
+
+/* ── OUTER SHELL ── */
+.shell {
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(10,28,53,0.14), 0 2px 8px rgba(10,28,53,0.06);
+}
+
+/* ── HEADER ── */
+.cf-header {
+  background: var(--ink);
+  padding: 28px 32px 24px;
+}
+
+.cf-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Logo lockup */
+.lockup { display: flex; align-items: center; gap: 14px; }
+
+.aeod-mark {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  width: 52px;
+  flex-shrink: 0;
+}
+
+.aeod-sq {
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+}
+
+.lockup-divider {
+  width: 1.5px;
+  height: 46px;
+  background: rgba(59,168,240,0.25);
+}
+
+.aeod-wordmark { display: flex; flex-direction: column; }
+
+.aeod-wordmark .wm-main {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.aeod-wordmark .wm-sub {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: var(--sky);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* Step tracker */
+.step-tracker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.25);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.step-dot.done {
+  background: var(--sapphire);
+  border-color: var(--sapphire);
+  color: var(--white);
+}
+
+.step-dot.active {
+  background: var(--sky);
+  border-color: var(--sky);
+  color: var(--navy);
+}
+
+.step-line {
+  width: 22px;
+  height: 1.5px;
+  background: rgba(255,255,255,0.08);
+  transition: background 0.3s;
+}
+
+.step-line.done { background: var(--sapphire); }
+
+/* Header copy */
+.hdr-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: rgba(59,168,240,0.65);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.hdr-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 34px;
+  font-weight: 900;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.hdr-sub {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.38);
+  margin-top: 7px;
+  line-height: 1.5;
+}
+
+.sky-rule {
+  height: 2px;
+  background: var(--sky);
+  width: 56px;
+  margin-top: 14px;
+  border-radius: 1px;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-track {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sapphire) 0%, var(--sky) 100%);
+  transition: width 0.4s ease;
+}
+
+/* ── BODY ── */
+.cf-body {
+  background: var(--white);
+  padding: 32px;
+}
+
+/* ── STEP PANELS ── */
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+/* ── PART BADGE ── */
+.part-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--navy);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 14px;
+  margin-bottom: 22px;
+}
+
+.required-note {
+  font-size: 12px;
+  color: var(--slate);
+  margin-bottom: 22px;
+  font-style: italic;
+  font-weight: 300;
+}
+
+/* ── STEP INTRO ── */
+.step-intro {
+  background: var(--cloud);
+  border-left: 3px solid var(--sky);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 28px;
+}
+
+.step-intro .si-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--sky);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.step-intro h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+}
+
+.step-intro p {
+  font-size: 13px;
+  color: var(--slate);
+  margin-top: 4px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* ── FIELD GROUPS ── */
+.field-group { margin-bottom: 26px; }
+
+.fg-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--sapphire);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fg-label::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--rule);
+}
+
+/* ── FORM FIELDS ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: 0.2px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--sky);
+  box-shadow: 0 0 0 3px rgba(59,168,240,0.1);
+}
+
+.field textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238FA5C0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+
+/* ── GRIDS ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+@media (max-width: 540px) {
+  .grid2, .grid3 { grid-template-columns: 1fr; }
+}
+
+/* ── PILL SELECTORS ── */
+.pill-q {
+  font-size: 13px;
+  color: var(--navy);
+  font-weight: 500;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--slate);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--white);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.pill:hover { border-color: var(--sky); color: var(--sapphire); background: #f0f8ff; }
+
+.pill.sel {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+}
+
+.pill.sel-multi {
+  background: #EBF4FD;
+  border-color: var(--sapphire);
+  color: var(--navy);
+  font-weight: 600;
+}
+
+/* ── PLATFORM CARDS ── */
+.platform-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 480px) {
+  .platform-grid { grid-template-columns: 1fr; }
+}
+
+.pcard {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--white);
+  position: relative;
+}
+
+.pcard:hover {
+  border-color: var(--sky);
+  background: var(--cloud);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10,28,53,0.08);
+}
+
+.pcard.sel {
+  border-color: var(--sapphire);
+  border-width: 2px;
+  background: #EBF4FD;
+}
+
+.pcard-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sapphire);
+  color: var(--white);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pcard.sel .pcard-check { display: flex; }
+
+.pcard-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 7px;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.pcard-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+.pcard-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--sky);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.pcard-desc {
+  font-size: 12px;
+  color: var(--slate);
+  margin-top: 7px;
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+.pcard.sel .pcard-name { color: var(--sapphire); }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 1.5px dashed var(--rule);
+  border-radius: 8px;
+  padding: 32px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--cloud);
+}
+
+.upload-zone:hover {
+  border-color: var(--sky);
+  background: #EBF4FD;
+}
+
+.upload-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+
+.upload-zone .uz-main {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sapphire);
+  margin-bottom: 4px;
+}
+
+.upload-zone .uz-types {
+  font-size: 12px;
+  color: var(--slate);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.upload-zone .uz-limit {
+  font-size: 11px;
+  color: rgba(143,165,192,0.6);
+  margin-top: 8px;
+}
+
+/* ── COMMITMENT BOX ── */
+.commitment-box {
+  background: var(--cloud);
+  border: 0.5px solid var(--rule);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 4px;
+}
+
+.commitment-box .cb-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--sapphire);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.commitment-box p {
+  font-size: 12px;
+  color: var(--slate);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ── BUTTONS ── */
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--rule);
+}
+
+.btn {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 11px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  letter-spacing: 0.3px;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: var(--white);
+}
+.btn-primary:hover { background: var(--sapphire); }
+
+.btn-sky {
+  background: var(--sky);
+  color: var(--navy);
+  font-size: 14px;
+  padding: 12px 28px;
+}
+.btn-sky:hover { background: #2898e8; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--slate);
+  border: 1px solid var(--rule);
+}
+.btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
+
+.save-ind {
+  font-size: 11px;
+  color: var(--sky);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+}
+
+.save-ind svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* ── CONFIRMATION ── */
+.confirm-hero {
+  background: var(--navy);
+  border-radius: 10px;
+  padding: 36px 32px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.confirm-check {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--sky);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 26px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.confirm-hero h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+}
+
+.confirm-hero p {
+  font-size: 13px;
+  color: rgba(143,165,192,0.9);
+  line-height: 1.7;
+  font-weight: 300;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.next-steps-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--sapphire);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.next-steps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .next-steps-grid { grid-template-columns: 1fr; }
+}
+
+.ns-card {
+  background: var(--cloud);
+  border: 0.5px solid var(--rule);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.ns-num {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--sapphire);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 auto 10px;
+}
+
+.ns-card p {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+.ns-card span {
+  font-size: 11px;
+  color: var(--slate);
+  display: block;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.schedule-cta {
+  background: var(--navy);
+  border-radius: 8px;
+  padding: 22px;
+  text-align: center;
+}
+
+.schedule-cta p {
+  font-size: 12px;
+  color: var(--slate);
+  margin-bottom: 12px;
+  font-weight: 300;
+}
+
+.tagline {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 11px;
+  color: var(--slate);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ── TRUST BAR ── */
+.trust-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 14px 24px;
+  background: #EAEEF4;
+  border-radius: 0 0 14px 14px;
+  flex-wrap: wrap;
+  border-top: 0.5px solid var(--rule);
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--slate);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.trust-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sky);
+  flex-shrink: 0;
+}
+
+/* ── FOOTER NOTE ── */
+.footer-note {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 11px;
+  color: rgba(143,165,192,0.6);
+}
+
+
+/* ── V2.0 PRODUCTION-READINESS EXTENSIONS ── */
+.utility-bar{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;background:#fff;padding:12px 18px;border-bottom:.5px solid var(--rule)}
+.utility-btn{font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;padding:8px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--white);color:var(--navy);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.utility-btn:hover{border-color:var(--sky);background:var(--cloud)}
+.utility-btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.utility-btn.primary:hover{background:var(--sapphire)}
+.system-note{background:#EBF4FD;border-left:3px solid var(--sapphire);padding:12px 14px;border-radius:0 7px 7px 0;font-size:12px;color:#526B89;line-height:1.55;margin:12px 0 18px}
+.system-note strong{color:var(--navy)}
+.hours-table{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.hours-head,.hours-row{display:grid;grid-template-columns:88px 64px 1fr 1fr;gap:8px;align-items:center}
+.hours-head{font-size:9px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:1.5px;padding:0 7px}
+.hours-row{background:var(--cloud);border:1px solid var(--rule);border-radius:7px;padding:7px}
+.hours-day{font-size:12px;font-weight:700;color:var(--navy)}
+.day-toggle{display:flex;align-items:center;justify-content:center}
+.day-toggle input{width:16px;height:16px;accent-color:var(--sapphire)}
+.hours-row input[type=time]{font-family:'Barlow',sans-serif;font-size:12px;padding:7px 9px;border:1px solid var(--rule);border-radius:6px;color:var(--navy);background:#fff;width:100%}
+.social-grid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.social-row{display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:center;background:var(--cloud);border:1px solid var(--rule);border-radius:8px;padding:9px 10px}
+.social-check{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--navy);cursor:pointer}
+.social-check input{width:15px;height:15px;accent-color:var(--sapphire)}
+.social-row input[type=url]{font-family:'Barlow',sans-serif;font-size:12px;padding:8px 10px;border:1px solid var(--rule);border-radius:6px;width:100%;color:var(--navy)}
+.module-summary{background:var(--navy);color:#fff;border-radius:8px;padding:13px 15px;margin:14px 0;font-size:12px;line-height:1.5}
+.module-summary strong{color:var(--sky)}
+.discovery-module{display:none;border:1px solid var(--rule);border-radius:9px;padding:16px;margin:10px 0;background:#fff}
+.discovery-module.active{display:block}
+.discovery-module h4{font-family:'Barlow Condensed',sans-serif;font-size:18px;color:var(--navy);text-transform:uppercase;margin-bottom:10px}
+.discovery-module .module-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sky);font-weight:700;margin-bottom:4px}
+.file-item{display:flex;align-items:center;gap:8px;background:var(--cloud);border:1px solid var(--rule);border-radius:6px;padding:7px 9px;margin-top:6px}
+.file-item .fname{font-size:12px;color:var(--navy);flex:1;word-break:break-all}.file-item .fsize{font-size:10px;color:var(--slate)}
+.submit-status{background:#fff8e8;border:1px solid #E7C76B;color:#72570F;border-radius:8px;padding:14px 16px;font-size:12px;line-height:1.6;margin-bottom:16px;text-align:left}
+.print-only{display:none}
+.pdf-overlay{display:none;position:fixed;inset:0;background:rgba(6,14,26,.88);z-index:9999;align-items:center;justify-content:center;padding:20px}.pdf-overlay.active{display:flex}
+.pdf-modal{background:#fff;border-radius:12px;max-width:470px;width:100%;padding:28px;text-align:center;box-shadow:0 15px 60px rgba(0,0,0,.25)}
+.pdf-modal h3{font-family:'Barlow Condensed',sans-serif;font-size:24px;text-transform:uppercase;color:var(--navy);margin-bottom:8px}.pdf-modal p{font-size:12px;color:var(--slate);line-height:1.6;margin-bottom:18px}
+@media(max-width:540px){.hours-head,.hours-row{grid-template-columns:74px 52px 1fr 1fr;gap:5px}.social-row{grid-template-columns:1fr}.utility-bar{justify-content:center}}
+@media print{body{padding:0!important;background:#fff!important}.page-wrap{max-width:none!important}.shell{box-shadow:none!important}.cf-header,.progress-track,.utility-bar,.btn-row,.trust-bar,.footer-note{display:none!important}.cf-body{padding:0!important}.step-panel{display:block!important}.step-panel:not(.print-summary-panel){display:none!important}.print-summary-panel{display:block!important}.print-only{display:block!important}}
+
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+<div class="shell">
+
+<!-- ═══════════════════════════════════
+     HEADER
+═══════════════════════════════════ -->
+<div class="cf-header">
+  <div class="cf-header-top">
+
+    <!-- Logo -->
+    <div class="lockup">
+      <div class="aeod-mark">
+        <div class="aeod-sq" style="background:#0A2A50;"></div>
+        <div class="aeod-sq" style="background:#1558A8;"></div>
+        <div class="aeod-sq" style="background:#1558A8;"></div>
+        <div class="aeod-sq" style="background:#3BA8F0;"></div>
+      </div>
+      <div class="lockup-divider"></div>
+      <div class="aeod-wordmark">
+        <span class="wm-main">AEOD</span>
+        <span class="wm-sub">Technologies</span>
+      </div>
+    </div>
+
+    <!-- Step tracker -->
+    <div class="step-tracker">
+      <div class="step-dot active" id="sd1">1</div>
+      <div class="step-line" id="sl1"></div>
+      <div class="step-dot" id="sd2">2</div>
+      <div class="step-line" id="sl2"></div>
+      <div class="step-dot" id="sd3">3</div>
+      <div class="step-line" id="sl3"></div>
+      <div class="step-dot" id="sd4">4</div>
+    </div>
+
+  </div>
+
+  <div id="hdr-eyebrow" class="hdr-eyebrow">Step 1 of 4 — Contact &amp; Organization</div>
+  <div id="hdr-title" class="hdr-title">AI Readiness &amp;<br>Platform Fit Intake</div>
+  <div id="hdr-sub" class="hdr-sub">Tell us about your organization so we can design the right solution for you.</div>
+  <div class="sky-rule"></div>
+</div>
+
+<!-- Progress -->
+<div class="progress-track">
+  <div class="progress-fill" id="prog" style="width: 25%;"></div>
+</div>
+<div class="utility-bar">
+  <button class="utility-btn" type="button" onclick="saveDraft()">💾 Save Draft</button>
+  <button class="utility-btn" type="button" onclick="openPrintModal()">🖨 Print / Save PDF</button>
+</div>
+
+<!-- ═══════════════════════════════════
+     BODY
+═══════════════════════════════════ -->
+<div class="cf-body">
+
+  <!-- ──────────────────────────
+       STEP 1 · CONTACT & ORG
+  ────────────────────────── -->
+  <div class="step-panel active" id="panel-1">
+
+    <div class="part-badge">Part 1 — Intake Form</div>
+    <p class="required-note">Fields marked (*) are required to continue.</p>
+
+    <!-- Contact -->
+    <div class="field-group">
+      <div class="fg-label">Contact Information</div>
+      <div class="grid2">
+        <div class="field">
+          <label>Full Name *</label>
+          <input type="text" id="f-name" placeholder="Jane Smith" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>Title / Role *</label>
+          <input type="text" id="f-title" placeholder="City Manager">
+        </div>
+        <div class="field">
+          <label>Organization Name *</label>
+          <input type="text" id="f-org" placeholder="City of Riverside" autocomplete="organization">
+        </div>
+        <div class="field">
+          <label>Email Address *</label>
+          <input type="email" id="f-email" placeholder="jane@riverside.gov" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="f-phone" placeholder="+1 (555) 000-0000" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label>Website</label>
+          <input type="url" id="f-web" placeholder="https://www.yourorg.gov" autocomplete="url">
+        </div>
+        <div class="field">
+          <label>City / State</label>
+          <input type="text" id="f-city" placeholder="Riverside, CA" autocomplete="address-level2">
+        </div>
+        <div class="field">
+          <label>Preferred Contact Method</label>
+          <select id="f-contact">
+            <option value="">Select preference...</option>
+            <option>Email</option>
+            <option>Phone</option>
+            <option>Text</option>
+            <option>Zoom / Virtual Meeting</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid3" style="margin-top:10px;">
+        <div class="field"><label>Legal Structure</label><select id="f-legal"><option value="">Select...</option><option>LLC</option><option>Corporation / C-Corp</option><option>S-Corporation</option><option>Partnership</option><option>Sole Proprietorship</option><option>Nonprofit</option><option>Government / Public Entity</option><option>Authority / Board / Commission</option><option>Other</option></select></div>
+        <div class="field"><label>Number of Locations</label><input type="number" min="1" id="f-locations" placeholder="1"></div>
+        <div class="field"><label>Primary Operating Location</label><input type="text" id="f-primary-location" placeholder="City, State or full address"></div>
+      </div>
+    </div>
+
+    <!-- Org Type -->
+    <div class="field-group">
+      <div class="fg-label">Organization Type</div>
+      <p class="pill-q">Which best describes your organization? *</p>
+      <div class="pill-group" id="org-type">
+        <span class="pill module-trigger" data-module="government" onclick="spModule(this,'org-type')">Municipality / Government</span>
+        <span class="pill module-trigger" data-module="business" onclick="spModule(this,'org-type')">Small / Mid-Market Business</span>
+        <span class="pill module-trigger" data-module="industrial" onclick="spModule(this,'org-type')">Manufacturing / Industrial</span>
+        <span class="pill module-trigger" data-module="construction" onclick="spModule(this,'org-type')">Contractor / Construction</span>
+        <span class="pill module-trigger" data-module="agriculture" onclick="spModule(this,'org-type')">Agriculture / Agribusiness</span>
+        <span class="pill module-trigger" data-module="legal" onclick="spModule(this,'org-type')">Law Firm / Legal Services</span>
+        <span class="pill module-trigger" data-module="nonprofit" onclick="spModule(this,'org-type')">Nonprofit / Foundation / Association</span>
+        <span class="pill module-trigger" data-module="executive" onclick="spModule(this,'org-type')">Executive / Leadership Office</span>
+        <span class="pill module-trigger" data-module="retail" onclick="spModule(this,'org-type')">Retail / Hospitality / Consumer</span>
+        <span class="pill module-trigger" data-module="technology" onclick="spModule(this,'org-type')">Technology / SaaS / Digital</span>
+        <span class="pill module-trigger" data-module="realestate" onclick="spModule(this,'org-type')">Real Estate / Development / Infrastructure</span>
+        <span class="pill module-trigger" data-module="other" onclick="spModule(this,'org-type')">Other / Hybrid</span>
+      </div>
+    </div>
+
+    <!-- Size -->
+    <div class="field-group">
+      <div class="fg-label">Size &amp; Scope</div>
+      <div class="grid3">
+        <div class="field">
+          <label>Number of Employees</label>
+          <select>
+            <option value="">Select...</option>
+            <option>1–10</option>
+            <option>11–50</option>
+            <option>51–200</option>
+            <option>201–500</option>
+            <option>500+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Number of Departments</label>
+          <select>
+            <option value="">Select...</option>
+            <option>1–3</option>
+            <option>4–8</option>
+            <option>9–15</option>
+            <option>16–30</option>
+            <option>30+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Years in Operation</label>
+          <select>
+            <option value="">Select...</option>
+            <option>Less than 1 year</option>
+            <option>1–3 years</option>
+            <option>4–10 years</option>
+            <option>11–25 years</option>
+            <option>25+ years</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="fg-label">Operating Schedule</div>
+      <p class="pill-q">What days and hours does the organization actually operate?</p>
+      <div class="system-note"><strong>This is different from meeting availability.</strong> AEOD uses the operating schedule to design automation windows, staffing coverage, service routing, escalation rules, and after-hours workflows.</div>
+      <div class="hours-table">
+        <div class="hours-head"><span>Day</span><span>Open?</span><span>Opens</span><span>Closes</span></div>
+        <div class="hours-row"><span class="hours-day">Monday</span><span class="day-toggle"><input type="checkbox" class="day-open" data-day="Monday"></span><input type="time" class="day-start" data-day="Monday" aria-label="Monday opening time"><input type="time" class="day-end" data-day="Monday" aria-label="Monday closing time"></div>
+        <div class="hours-row"><span class="hours-day">Tuesday</span><span class="day-toggle"><input type="checkbox" class="day-open" data-day="Tuesday"></span><input type="time" class="day-start" data-day="Tuesday" aria-label="Tuesday opening time"><input type="time" class="day-end" data-day="Tuesday" aria-label="Tuesday closing time"></div>
+        <div class="hours-row"><span class="hours-day">Wednesday</span><span class="day-toggle"><input type="checkbox" class="day-open" data-day="Wednesday"></span><input type="time" class="day-start" data-day="Wednesday" aria-label="Wednesday opening time"><input type="time" class="day-end" data-day="Wednesday" aria-label="Wednesday closing time"></div>
+        <div class="hours-row"><span class="hours-day">Thursday</span><span class="day-toggle"><input type="checkbox" class="day-open" data-day="Thursday"></span><input type="time" class="day-start" data-day="Thursday" aria-label="Thursday opening time"><input type="time" class="day-end" data-day="Thursday" aria-label="Thursday closing time"></div>
+        <div class="hours-row"><span class="hours-day">Friday</span><span class="day-toggle"><input type="checkbox" class="day-open" data-day="Friday"></span><input type="time" class="day-start" data-day="Friday" aria-label="Friday opening time"><input type="time" class="day-end" data-day="Friday" aria-label="Friday closing time"></div>
+        <div class="hours-row"><span class="hours-day">Saturday</span><span class="day-toggle"><input type="checkbox" class="day-open" data-day="Saturday"></span><input type="time" class="day-start" data-day="Saturday" aria-label="Saturday opening time"><input type="time" class="day-end" data-day="Saturday" aria-label="Saturday closing time"></div>
+        <div class="hours-row"><span class="hours-day">Sunday</span><span class="day-toggle"><input type="checkbox" class="day-open" data-day="Sunday"></span><input type="time" class="day-start" data-day="Sunday" aria-label="Sunday opening time"><input type="time" class="day-end" data-day="Sunday" aria-label="Sunday closing time"></div>
+      </div>
+      <div class="grid3" style="margin-top:12px;">
+        <div class="field"><label>Number of Shifts</label><input type="number" min="1" id="op-shifts" placeholder="1"></div>
+        <div class="field"><label>Receiving / Service Window</label><input type="text" id="op-receiving" placeholder="e.g., Mon-Fri 7 AM-3 PM"></div>
+        <div class="field"><label>Timezone</label><select id="op-timezone"><option>Central Time</option><option>Eastern Time</option><option>Mountain Time</option><option>Pacific Time</option><option>Other / Multiple</option></select></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Shift Times / Coverage Notes</label><input type="text" id="op-shift-times" placeholder="e.g., 6 AM-2 PM; 2 PM-10 PM"></div>
+        <div class="field"><label>After-Hours / Emergency Contact</label><input type="text" id="op-after-hours" placeholder="Name, role, phone or escalation method"></div>
+      </div>
+      <div class="field"><label>Seasonal / Holiday / Multi-Location Schedule Notes</label><textarea id="op-schedule-notes" placeholder="Describe seasonal hours, location differences, shutdown periods, 24/7 operations, on-call coverage, or other scheduling conditions."></textarea></div>
+    </div>
+
+    <div class="field-group">
+      <div class="fg-label">Website & Digital Presence</div>
+      <div class="grid2">
+        <div class="field"><label>Primary Website</label><input type="url" id="digital-web" placeholder="https://..."></div>
+        <div class="field"><label>Who Manages Digital / Social?</label><input type="text" id="digital-owner" placeholder="Owner, staff, agency, contractor, no one..."></div>
+      </div>
+      <p class="pill-q">Select the channels the organization actively uses and provide the actual profile/page link.</p>
+      <div class="social-grid">
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="facebook"><span>Facebook</span></label><input type="url" data-social-url="facebook" placeholder="https://facebook.com/..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="instagram"><span>Instagram</span></label><input type="url" data-social-url="instagram" placeholder="https://instagram.com/..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="linkedin"><span>LinkedIn</span></label><input type="url" data-social-url="linkedin" placeholder="https://linkedin.com/..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="x"><span>X / Twitter</span></label><input type="url" data-social-url="x" placeholder="https://x.com/..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="tiktok"><span>TikTok</span></label><input type="url" data-social-url="tiktok" placeholder="https://tiktok.com/@..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="youtube"><span>YouTube</span></label><input type="url" data-social-url="youtube" placeholder="https://youtube.com/@..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="threads"><span>Threads</span></label><input type="url" data-social-url="threads" placeholder="https://threads.net/@..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="pinterest"><span>Pinterest</span></label><input type="url" data-social-url="pinterest" placeholder="https://pinterest.com/..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="snapchat"><span>Snapchat</span></label><input type="url" data-social-url="snapchat" placeholder="https://snapchat.com/add/..."></div>
+        <div class="social-row"><label class="social-check"><input type="checkbox" data-social="nextdoor"><span>Nextdoor</span></label><input type="url" data-social-url="nextdoor" placeholder="https://nextdoor.com/pages/..."></div>
+      </div>
+      <div class="field" style="margin-top:10px;"><label>Other Digital / Community Channels</label><textarea id="digital-other" placeholder="Podcast, Substack, Discord, WhatsApp Channel, industry community, app stores, other directories or networks. Include links where available."></textarea></div>
+    </div>
+
+    <div class="btn-row">
+      <span class="save-ind">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3BA8F0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Your information is secure
+      </span>
+      <button class="btn btn-primary" onclick="goTo(2)">Continue &rarr;</button>
+    </div>
+
+  </div><!-- /panel-1 -->
+
+
+  <!-- ──────────────────────────
+       STEP 2 · CHALLENGE + PLATFORMS
+  ────────────────────────── -->
+  <div class="step-panel" id="panel-2">
+
+    <div class="part-badge">Part 1 — Intake Form</div>
+
+    <div class="step-intro">
+      <div class="si-label">Your Challenge</div>
+      <h3>What problem are we solving?</h3>
+      <p>Help us understand your situation so we can match you to the right AEOD platform and service approach.</p>
+    </div>
+
+    <!-- Challenge -->
+    <div class="field-group">
+      <div class="fg-label">Primary Challenge</div>
+      <p class="pill-q">What is your biggest operational challenge right now? *</p>
+      <div class="pill-group" id="challenge">
+        <span class="pill" onclick="sp(this,'challenge')">Too many manual processes</span>
+        <span class="pill" onclick="sp(this,'challenge')">Missed calls or slow response times</span>
+        <span class="pill" onclick="sp(this,'challenge')">Poor client or citizen intake</span>
+        <span class="pill" onclick="sp(this,'challenge')">Disorganized documents</span>
+        <span class="pill" onclick="sp(this,'challenge')">No dashboard or reporting visibility</span>
+        <span class="pill" onclick="sp(this,'challenge')">Staff overwhelmed with repetitive work</span>
+        <span class="pill" onclick="sp(this,'challenge')">Need AI strategy and direction</span>
+        <span class="pill" onclick="sp(this,'challenge')">Need automation across multiple systems</span>
+        <span class="pill" onclick="sp(this,'challenge')">RFP / contract review bottleneck</span>
+        <span class="pill" onclick="sp(this,'challenge')">No project or service tracking</span>
+        <span class="pill" onclick="sp(this,'challenge')">Other</span>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="field-group">
+      <div class="fg-label">In Your Own Words</div>
+      <div class="field">
+        <label>Describe your current challenge in a few sentences</label>
+        <textarea placeholder="Walk us through the problem. What is happening today, and what would you like to see change? The more detail you share, the more accurate our recommendation will be."></textarea>
+      </div>
+    </div>
+
+    <!-- Platform cards -->
+    <div class="field-group">
+      <div class="fg-label">Platform Interest</div>
+      <p class="pill-q">Which AEOD platform best fits your organization? (Select all that apply)</p>
+
+      <div class="platform-grid">
+        <div class="pcard" id="pc-civic" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">🏛️</div><div class="pcard-name">CivicFlo AI</div><div class="pcard-tag">Government & Municipal</div><div class="pcard-desc">Citizen intake, service requests, routing, permits, public workflows, and municipal operations.</div></div>
+        <div class="pcard" id="pc-crew" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">🛠️</div><div class="pcard-name">CrewFloPros</div><div class="pcard-tag">Construction & Field Operations</div><div class="pcard-desc">Crew, project, RFP/RFI, safety, permits, costs, equipment, and field-service operations.</div></div>
+        <div class="pcard" id="pc-legal" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">⚖️</div><div class="pcard-name">LegalFlo AI</div><div class="pcard-tag">Legal & Compliance</div><div class="pcard-desc">Client intake, matters, deadlines, document/contract intelligence, workflow automation, and attorney oversight.</div></div>
+        <div class="pcard" id="pc-agri" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">🌾</div><div class="pcard-name">AgriFloPros</div><div class="pcard-tag">Agriculture & Rural</div><div class="pcard-desc">Farm and agribusiness records, field operations, workforce, grants, compliance, and rural workflows.</div></div>
+        <div class="pcard" id="pc-cos" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">🧭</div><div class="pcard-name">Chief of Staff OS</div><div class="pcard-tag">Executive Leadership</div><div class="pcard-desc">Executive intelligence, briefings, commitments, stakeholders, decisions, follow-up, and command workflows.</div></div>
+        <div class="pcard" id="pc-veterans" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">🛡️</div><div class="pcard-name">Veterans Shield</div><div class="pcard-tag">Veterans & Benefits</div><div class="pcard-desc">Veteran navigation, documentation, resources, claims-support workflow, and service coordination.</div></div>
+        <div class="pcard" id="pc-reset" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">↻</div><div class="pcard-name">RESET</div><div class="pcard-tag">Transformation & Recovery</div><div class="pcard-desc">Structured reset, assessment, action planning, accountability, resource navigation, and progress tracking.</div></div>
+        <div class="pcard" id="pc-memoria" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">🕊️</div><div class="pcard-name">MemoriaFlo AI</div><div class="pcard-tag">Memorial & Family Services</div><div class="pcard-desc">Family intake, memorial planning, records, communications, service coordination, and compassionate workflow support.</div></div>
+        <div class="pcard" id="pc-retail" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">🛍️</div><div class="pcard-name">RetailFlo AI</div><div class="pcard-tag">Retail & Multi-Department</div><div class="pcard-desc">Sales intelligence, forecasting, department performance, inventory, operations, and management visibility.</div></div>
+        <div class="pcard" id="pc-board" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">▦</div><div class="pcard-name">BoardFlo AI</div><div class="pcard-tag">Boards & Governance</div><div class="pcard-desc">Board packets, agendas, decisions, actions, governance records, reporting, and institutional continuity.</div></div>
+        <div class="pcard" id="pc-custom" onclick="toggleCard(this)"><div class="pcard-check">&#10003;</div><div class="pcard-icon">⚙️</div><div class="pcard-name">Custom AI / Agentic Systems</div><div class="pcard-tag">Tailored Enterprise AI</div><div class="pcard-desc">AI agents, workflow automation, data integration, dashboards, voice, orchestration, and custom operational systems.</div></div>
+      </div>
+
+      <!-- Supporting services -->
+      <p class="pill-q" style="margin-top: 14px;">Supporting services you may need (select all that apply)</p>
+      <div class="pill-group" id="services">
+        <span class="pill" onclick="tp(this)">AI Website + Automation</span>
+        <span class="pill" onclick="tp(this)">AI Automation Systems</span>
+        <span class="pill" onclick="tp(this)">AI Lead Generation</span>
+        <span class="pill" onclick="tp(this)">AI Website + CRM</span>
+        <span class="pill" onclick="tp(this)">AI Training & Education</span>
+        <span class="pill" onclick="tp(this)">AI Video Generation</span>
+        <span class="pill" onclick="tp(this)">AI Chatbots</span>
+        <span class="pill" onclick="tp(this)">AI Social Media Automation</span>
+        <span class="pill" onclick="tp(this)">AI Proposal / RFP Automation</span>
+        <span class="pill" onclick="tp(this)">AI Data Dashboards</span>
+        <span class="pill" onclick="tp(this)">AI Executive Assistant</span>
+        <span class="pill" onclick="tp(this)">AI Document / Contract Analysis</span>
+        <span class="pill" onclick="tp(this)">AI Governance & Cybersecurity</span>
+        <span class="pill" onclick="tp(this)">AI Agent Orchestration</span>
+        <span class="pill" onclick="tp(this)">Voice Agents</span>
+        <span class="pill" onclick="tp(this)">Not sure yet</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="fg-label">Conditional Discovery</div>
+      <div class="module-summary" id="module-summary"><strong>Universal core active.</strong> Choose the organization type in Step 1 and AEOD will surface the relevant deeper discovery module here.</div>
+      <div class="discovery-module" data-module-panel="government"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Government / Public-Sector Discovery</h4><div class="field"><label>Departments or services most affected</label><input type="text" data-module-field="government" placeholder="Brief response or note for discovery"></div><div class="field"><label>Citizen/customer volume or service demand</label><input type="text" data-module-field="government" placeholder="Brief response or note for discovery"></div><div class="field"><label>Current intake/routing process</label><input type="text" data-module-field="government" placeholder="Brief response or note for discovery"></div><div class="field"><label>Procurement / approval constraints</label><input type="text" data-module-field="government" placeholder="Brief response or note for discovery"></div><div class="field"><label>Public records / retention requirements</label><input type="text" data-module-field="government" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="industrial"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Manufacturing / Industrial Discovery</h4><div class="field"><label>Primary production or operational flow</label><input type="text" data-module-field="industrial" placeholder="Brief response or note for discovery"></div><div class="field"><label>Current bottleneck / capacity constraint</label><input type="text" data-module-field="industrial" placeholder="Brief response or note for discovery"></div><div class="field"><label>Inventory / traceability approach</label><input type="text" data-module-field="industrial" placeholder="Brief response or note for discovery"></div><div class="field"><label>Maintenance / downtime issues</label><input type="text" data-module-field="industrial" placeholder="Brief response or note for discovery"></div><div class="field"><label>Shipping / logistics constraints</label><input type="text" data-module-field="industrial" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="construction"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Construction / Field Operations Discovery</h4><div class="field"><label>Active project / crew model</label><input type="text" data-module-field="construction" placeholder="Brief response or note for discovery"></div><div class="field"><label>Scheduling and field reporting process</label><input type="text" data-module-field="construction" placeholder="Brief response or note for discovery"></div><div class="field"><label>RFP / RFI / change-order workflow</label><input type="text" data-module-field="construction" placeholder="Brief response or note for discovery"></div><div class="field"><label>Permits / inspections / safety process</label><input type="text" data-module-field="construction" placeholder="Brief response or note for discovery"></div><div class="field"><label>Equipment and cost-control pain points</label><input type="text" data-module-field="construction" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="agriculture"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Agriculture / Agribusiness Discovery</h4><div class="field"><label>Farm / operation type and acreage or scale</label><input type="text" data-module-field="agriculture" placeholder="Brief response or note for discovery"></div><div class="field"><label>Field / livestock / production records</label><input type="text" data-module-field="agriculture" placeholder="Brief response or note for discovery"></div><div class="field"><label>Seasonal labor and scheduling</label><input type="text" data-module-field="agriculture" placeholder="Brief response or note for discovery"></div><div class="field"><label>Grant / compliance / documentation needs</label><input type="text" data-module-field="agriculture" placeholder="Brief response or note for discovery"></div><div class="field"><label>Equipment / inventory / logistics challenges</label><input type="text" data-module-field="agriculture" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="legal"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Legal Services Discovery</h4><div class="field"><label>Practice areas and matter types</label><input type="text" data-module-field="legal" placeholder="Brief response or note for discovery"></div><div class="field"><label>Client intake and conflict-check process</label><input type="text" data-module-field="legal" placeholder="Brief response or note for discovery"></div><div class="field"><label>Matter / deadline / document systems</label><input type="text" data-module-field="legal" placeholder="Brief response or note for discovery"></div><div class="field"><label>Contract / discovery / document-review volume</label><input type="text" data-module-field="legal" placeholder="Brief response or note for discovery"></div><div class="field"><label>Attorney approval and privilege boundaries</label><input type="text" data-module-field="legal" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="nonprofit"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Nonprofit / Association Discovery</h4><div class="field"><label>Programs / mission delivery model</label><input type="text" data-module-field="nonprofit" placeholder="Brief response or note for discovery"></div><div class="field"><label>Board and governance workflow</label><input type="text" data-module-field="nonprofit" placeholder="Brief response or note for discovery"></div><div class="field"><label>Donor / member / volunteer systems</label><input type="text" data-module-field="nonprofit" placeholder="Brief response or note for discovery"></div><div class="field"><label>Grant / reporting requirements</label><input type="text" data-module-field="nonprofit" placeholder="Brief response or note for discovery"></div><div class="field"><label>Events / outreach / community engagement</label><input type="text" data-module-field="nonprofit" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="executive"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Executive / Leadership Discovery</h4><div class="field"><label>Executive priorities and recurring decisions</label><input type="text" data-module-field="executive" placeholder="Brief response or note for discovery"></div><div class="field"><label>Calendar / email / stakeholder load</label><input type="text" data-module-field="executive" placeholder="Brief response or note for discovery"></div><div class="field"><label>Commitment and follow-up process</label><input type="text" data-module-field="executive" placeholder="Brief response or note for discovery"></div><div class="field"><label>Briefings / reporting desired</label><input type="text" data-module-field="executive" placeholder="Brief response or note for discovery"></div><div class="field"><label>Authority and approval boundaries</label><input type="text" data-module-field="executive" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="retail"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Retail / Consumer Discovery</h4><div class="field"><label>Locations / departments / channels</label><input type="text" data-module-field="retail" placeholder="Brief response or note for discovery"></div><div class="field"><label>Sales and demand data available</label><input type="text" data-module-field="retail" placeholder="Brief response or note for discovery"></div><div class="field"><label>Inventory / purchasing workflow</label><input type="text" data-module-field="retail" placeholder="Brief response or note for discovery"></div><div class="field"><label>Customer experience / lead capture</label><input type="text" data-module-field="retail" placeholder="Brief response or note for discovery"></div><div class="field"><label>Forecasting / staffing / margin challenges</label><input type="text" data-module-field="retail" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="technology"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Technology / SaaS Discovery</h4><div class="field"><label>Core product / platform and users</label><input type="text" data-module-field="technology" placeholder="Brief response or note for discovery"></div><div class="field"><label>Data sources and integrations</label><input type="text" data-module-field="technology" placeholder="Brief response or note for discovery"></div><div class="field"><label>Current architecture / APIs</label><input type="text" data-module-field="technology" placeholder="Brief response or note for discovery"></div><div class="field"><label>Support / onboarding / customer success process</label><input type="text" data-module-field="technology" placeholder="Brief response or note for discovery"></div><div class="field"><label>Security / compliance / deployment requirements</label><input type="text" data-module-field="technology" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="realestate"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Real Estate / Development / Infrastructure Discovery</h4><div class="field"><label>Property / project portfolio</label><input type="text" data-module-field="realestate" placeholder="Brief response or note for discovery"></div><div class="field"><label>Development / entitlement / permitting stage</label><input type="text" data-module-field="realestate" placeholder="Brief response or note for discovery"></div><div class="field"><label>Capital / lender / investor workflow</label><input type="text" data-module-field="realestate" placeholder="Brief response or note for discovery"></div><div class="field"><label>Contractor / consultant coordination</label><input type="text" data-module-field="realestate" placeholder="Brief response or note for discovery"></div><div class="field"><label>Infrastructure / utility / stakeholder constraints</label><input type="text" data-module-field="realestate" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="business"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Business Operations Discovery</h4><div class="field"><label>Primary revenue model and customer segments</label><input type="text" data-module-field="business" placeholder="Brief response or note for discovery"></div><div class="field"><label>Sales / lead / CRM process</label><input type="text" data-module-field="business" placeholder="Brief response or note for discovery"></div><div class="field"><label>Core delivery workflow</label><input type="text" data-module-field="business" placeholder="Brief response or note for discovery"></div><div class="field"><label>Back-office repetitive processes</label><input type="text" data-module-field="business" placeholder="Brief response or note for discovery"></div><div class="field"><label>Growth / margin / staffing constraints</label><input type="text" data-module-field="business" placeholder="Brief response or note for discovery"></div></div>
+      <div class="discovery-module" data-module-panel="other"><div class="module-tag">AEOD Dynamic Discovery</div><h4>Hybrid / Other Discovery</h4><div class="field"><label>Describe the operating model</label><input type="text" data-module-field="other" placeholder="Brief response or note for discovery"></div><div class="field"><label>Primary users / stakeholders</label><input type="text" data-module-field="other" placeholder="Brief response or note for discovery"></div><div class="field"><label>Most repetitive workflow</label><input type="text" data-module-field="other" placeholder="Brief response or note for discovery"></div><div class="field"><label>Most important data sources</label><input type="text" data-module-field="other" placeholder="Brief response or note for discovery"></div><div class="field"><label>What must be measurable after implementation</label><input type="text" data-module-field="other" placeholder="Brief response or note for discovery"></div></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goTo(1)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="goTo(3)">Continue &rarr;</button>
+    </div>
+
+  </div><!-- /panel-2 -->
+
+
+  <!-- ──────────────────────────
+       STEP 3 · READINESS + DECISION
+  ────────────────────────── -->
+  <div class="step-panel" id="panel-3">
+
+    <div class="part-badge">Part 2 — AI Readiness Assessment</div>
+
+    <div class="step-intro">
+      <div class="si-label">Readiness &amp; Timeline</div>
+      <h3>How ready is your organization?</h3>
+      <p>This section helps AEOD design the right starting point — from an education session all the way to a full implementation proposal.</p>
+    </div>
+
+    <!-- Current Tech -->
+    <div class="field-group">
+      <div class="fg-label">Current Technology Stack</div>
+      <p class="pill-q">What tools does your team currently use? (Select all that apply)</p>
+      <div class="pill-group" id="tech-stack">
+        <span class="pill" onclick="tp(this)">Google Workspace</span>
+        <span class="pill" onclick="tp(this)">Microsoft 365</span>
+        <span class="pill" onclick="tp(this)">HubSpot CRM</span>
+        <span class="pill" onclick="tp(this)">Salesforce</span>
+        <span class="pill" onclick="tp(this)">QuickBooks / Accounting</span>
+        <span class="pill" onclick="tp(this)">ERP / Line-of-Business System</span>
+        <span class="pill" onclick="tp(this)">Project Management Software</span>
+        <span class="pill" onclick="tp(this)">Legal Practice Software</span>
+        <span class="pill" onclick="tp(this)">Construction Management Software</span>
+        <span class="pill" onclick="tp(this)">Agriculture / Farm Software</span>
+        <span class="pill" onclick="tp(this)">HR / Payroll System</span>
+        <span class="pill" onclick="tp(this)">Spreadsheets</span>
+        <span class="pill" onclick="tp(this)">Paper Forms</span>
+        <span class="pill" onclick="tp(this)">Email / Text Messages</span>
+        <span class="pill" onclick="tp(this)">AI Tools Already in Use</span>
+        <span class="pill" onclick="tp(this)">Custom / Legacy Systems</span>
+        <span class="pill" onclick="tp(this)">Other</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="fg-label">Integration & Workflow Context</div>
+      <div class="grid2">
+        <div class="field"><label>Systems that must remain / integrate</label><textarea id="integration-systems" placeholder="List core systems, databases, APIs, portals, file stores, or vendor platforms that AEOD should not replace without approval."></textarea></div>
+        <div class="field"><label>Processes you want automated first</label><textarea id="automation-first" placeholder="List repetitive, pattern-based work, high-volume handoffs, reporting, intake, document, scheduling, follow-up, or data-entry processes."></textarea></div>
+      </div>
+    </div>
+
+    <!-- AI Readiness -->
+    <div class="field-group">
+      <div class="fg-label">AI Readiness</div>
+      <div class="grid2">
+        <div class="field">
+          <label>Has your team used AI tools before?</label>
+          <select>
+            <option value="">Select...</option>
+            <option>Yes, we use AI tools regularly</option>
+            <option>A few times, exploring options</option>
+            <option>Not yet, but we are open to it</option>
+            <option>No, and we have some concerns</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Is leadership aligned on AI adoption?</label>
+          <select>
+            <option value="">Select...</option>
+            <option>Fully aligned — ready to move forward</option>
+            <option>Partially aligned — some buy-in needed</option>
+            <option>Not yet discussed at leadership level</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Are your current processes documented?</label>
+          <select>
+            <option value="">Select...</option>
+            <option>Yes — we have documented workflows and SOPs</option>
+            <option>Partially — some are documented</option>
+            <option>No — most knowledge is informal or verbal</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>How is your data currently organized?</label>
+          <select>
+            <option value="">Select...</option>
+            <option>Centralized and well-organized</option>
+            <option>Partially organized across systems</option>
+            <option>Scattered — spreadsheets, email, paper</option>
+            <option>Not organized at all</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline & Budget -->
+    <div class="field-group">
+      <div class="fg-label">Timeline &amp; Budget</div>
+      <div class="grid2">
+        <div>
+          <p class="pill-q">Desired timeline to start</p>
+          <div class="pill-group" id="timeline">
+            <span class="pill" onclick="sp(this,'timeline')">Immediately</span>
+            <span class="pill" onclick="sp(this,'timeline')">Within 30 days</span>
+            <span class="pill" onclick="sp(this,'timeline')">60–90 days</span>
+            <span class="pill" onclick="sp(this,'timeline')">Within 6 months</span>
+            <span class="pill" onclick="sp(this,'timeline')">Exploring only</span>
+          </div>
+        </div>
+        <div>
+          <p class="pill-q">Estimated investment range</p>
+          <div class="pill-group" id="budget">
+            <span class="pill" onclick="sp(this,'budget')">Under $2,500</span>
+            <span class="pill" onclick="sp(this,'budget')">$2,500 – $5,000</span>
+            <span class="pill" onclick="sp(this,'budget')">$5,000 – $10,000</span>
+            <span class="pill" onclick="sp(this,'budget')">$10,000 – $25,000</span>
+            <span class="pill" onclick="sp(this,'budget')">$25,000+</span>
+            <span class="pill" onclick="sp(this,'budget')">Not sure yet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decision -->
+    <div class="field-group">
+      <div class="fg-label">Decision Process</div>
+      <div class="grid2">
+        <div>
+          <p class="pill-q">Are you the decision-maker?</p>
+          <div class="pill-group" id="decision">
+            <span class="pill" onclick="sp(this,'decision')">Yes — I can approve</span>
+            <span class="pill" onclick="sp(this,'decision')">Part of the decision team</span>
+            <span class="pill" onclick="sp(this,'decision')">No — someone else approves</span>
+          </div>
+        </div>
+        <div class="field" style="margin-top: 4px;">
+          <label>Approval required from</label>
+          <select>
+            <option value="">Select if applicable...</option>
+            <option>CEO / Owner</option>
+            <option>Mayor / City Manager</option>
+            <option>Department Head</option>
+            <option>Board / Council</option>
+            <option>Procurement Office</option>
+            <option>Legal Counsel</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <p class="pill-q">Preferred next step with AEOD</p>
+        <div class="pill-group" id="nextstep">
+          <span class="pill" onclick="sp(this,'nextstep')">Schedule introductory call</span>
+          <span class="pill" onclick="sp(this,'nextstep')">Request a platform demo</span>
+          <span class="pill" onclick="sp(this,'nextstep')">AI readiness consultation</span>
+          <span class="pill" onclick="sp(this,'nextstep')">Request a formal proposal</span>
+          <span class="pill" onclick="sp(this,'nextstep')">Request NDA before sharing more</span>
+          <span class="pill" onclick="sp(this,'nextstep')">Send me more information first</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goTo(2)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="goTo(4)">Continue &rarr;</button>
+    </div>
+
+  </div><!-- /panel-3 -->
+
+
+  <!-- ──────────────────────────
+       STEP 4 · UPLOADS + SUBMIT
+  ────────────────────────── -->
+  <div class="step-panel" id="panel-4">
+
+    <div class="part-badge">Part 2 — Final Details</div>
+
+    <div class="step-intro">
+      <div class="si-label">Supporting Materials</div>
+      <h3>Help us understand your environment</h3>
+      <p>Document uploads are optional but help AEOD design a more accurate solution and accelerate your discovery process.</p>
+    </div>
+
+    <div class="field-group">
+      <div class="fg-label">Confidentiality Status</div>
+      <div class="grid2">
+        <div class="field"><label>NDA Status</label><select id="nda-status"><option value="">Select...</option><option>No NDA requested at this stage</option><option>NDA requested before sensitive discovery</option><option>NDA already executed</option><option>Existing agreement governs confidentiality</option></select></div>
+        <div class="field"><label>Data / Security Contact</label><input type="text" id="security-contact" placeholder="Name / role / email if applicable"></div>
+      </div>
+      <div class="system-note"><strong>Do not upload passwords, private keys, full payment-card data, Social Security numbers, health records, or other restricted credentials through this intake.</strong> Highly sensitive materials should use an AEOD-approved secure exchange method after the appropriate agreement and access controls are in place.</div>
+    </div>
+
+    <!-- Upload -->
+    <div class="field-group">
+      <div class="fg-label">Document Uploads (Optional)</div>
+      <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.webp" style="display:none;" onchange="handleFiles(this)">
+        <span class="upload-icon">📎</span>
+        <div class="uz-main">Click to upload or drag files here</div>
+        <div class="uz-types">
+          Current forms &nbsp;·&nbsp; Process documents &nbsp;·&nbsp; RFPs &nbsp;·&nbsp; Org chart<br>
+          Policies &nbsp;·&nbsp; Workflow diagrams &nbsp;·&nbsp; Sample reports
+        </div>
+        <div class="uz-limit">PDF, Word, Excel/CSV, PowerPoint, text, JPG/PNG/WebP &nbsp;·&nbsp; Multiple files supported</div>
+      </div>
+      <div id="file-list" style="margin-top: 10px; font-size: 12px; color: var(--sapphire);"></div>
+    </div>
+
+    <!-- Data Governance -->
+    <div class="field-group">
+      <div class="fg-label">Security &amp; Governance</div>
+      <p class="pill-q">Does your organization manage any of the following types of data? (Select all that apply)</p>
+      <div class="pill-group" id="data-types">
+        <span class="pill" onclick="tp(this)">Personal / PII data</span>
+        <span class="pill" onclick="tp(this)">Confidential legal records</span>
+        <span class="pill" onclick="tp(this)">Public-sector records</span>
+        <span class="pill" onclick="tp(this)">Financial data</span>
+        <span class="pill" onclick="tp(this)">Health-related data</span>
+        <span class="pill" onclick="tp(this)">Youth or student data</span>
+        <span class="pill" onclick="tp(this)">Procurement / contract data</span>
+        <span class="pill" onclick="tp(this)">Criminal justice data</span>
+        <span class="pill" onclick="tp(this)">None of the above</span>
+      </div>
+
+      <p class="pill-q" style="margin-top: 14px;">Does your organization currently have any of the following? (Select all that apply)</p>
+      <div class="pill-group" id="gov-policies">
+        <span class="pill" onclick="tp(this)">Cybersecurity policy</span>
+        <span class="pill" onclick="tp(this)">Data privacy policy</span>
+        <span class="pill" onclick="tp(this)">AI use policy</span>
+        <span class="pill" onclick="tp(this)">Records retention policy</span>
+        <span class="pill" onclick="tp(this)">Human oversight process for AI</span>
+        <span class="pill" onclick="tp(this)">None currently in place</span>
+      </div>
+    </div>
+
+    <!-- Vision -->
+    <div class="field-group">
+      <div class="fg-label">Success Vision</div>
+      <div class="field">
+        <label>What does success look like 90 days after working with AEOD?</label>
+        <textarea placeholder="Describe the outcome your organization needs. What should change, improve, or become possible that is not possible today?"></textarea>
+      </div>
+      <div class="field" style="margin-top: 4px;">
+        <label>Is there anything else AEOD should know before your discovery call?</label>
+        <textarea placeholder="Any context, constraints, prior AI experience, compliance requirements, or concerns worth sharing with our team..."></textarea>
+      </div>
+    </div>
+
+    <!-- Commitment -->
+    <div class="commitment-box">
+      <div class="cb-label">AEOD Human-Guided AI Commitment</div>
+      <p>AEOD Technologies designs every system with human oversight, responsible AI use, and practical governance at the center. Our goal is not to replace your team — it is to give them better visibility, smarter tools, and more time for the work that matters most. Every recommendation we make is reviewed by AEOD professionals before it reaches you. All information you share is handled with strict confidentiality.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goTo(3)">&larr; Back</button>
+      <button class="btn btn-sky" onclick="submitIntake()">Submit Intake &#8594;</button>
+    </div>
+
+  </div><!-- /panel-4 -->
+
+
+  <!-- ──────────────────────────
+       STEP 5 · CONFIRMATION
+  ────────────────────────── -->
+  <div class="step-panel" id="panel-5">
+
+    <div class="confirm-hero">
+      <div class="confirm-check">&#10003;</div>
+      <h3 id="confirmation-title">Intake Submitted</h3>
+      <p id="confirmation-message">Thank you. Your AEOD onboarding record has been securely received and verified for review.</p>
+    </div>
+
+    <div class="next-steps-label">What Happens Next</div>
+    <div class="next-steps-grid">
+      <div class="ns-card">
+        <div class="ns-num">1</div>
+        <p>AEOD Internal Review</p>
+        <span>Your intake is reviewed and assigned to the right team member within 24 hours.</span>
+      </div>
+      <div class="ns-card">
+        <div class="ns-num">2</div>
+        <p>Introductory Call</p>
+        <span>We schedule a 30-minute discovery call to align on your challenge and goals.</span>
+      </div>
+      <div class="ns-card">
+        <div class="ns-num">3</div>
+        <p>Platform Recommendation</p>
+        <span>AEOD prepares a structured recommendation based on your intake and discovery session.</span>
+      </div>
+      <div class="ns-card">
+        <div class="ns-num">4</div>
+        <p>Proposal or Pilot</p>
+        <span>We present a formal proposal with clear scope, timeline, and investment.</span>
+      </div>
+    </div>
+
+    <div class="schedule-cta">
+      <p>Want to speak with someone today? Skip the wait.</p>
+      <a href="mailto:info@aeodai.com?subject=Discovery Call Request — AEOD Intake" class="btn btn-sky">Request a Discovery Call &rarr;</a>
+    </div>
+
+    <div class="tagline">
+      "AEOD Technologies builds systems that run operations — not just tools that support them."
+    </div>
+
+  </div><!-- /panel-5 -->
+
+  <div class="step-panel print-summary-panel" id="panel-print">
+    <div class="print-only" id="print-summary"></div>
+  </div>
+
+</div><!-- /cf-body -->
+
+<!-- ═══════════════════════════════════
+     TRUST BAR
+═══════════════════════════════════ -->
+<div class="trust-bar" id="trust-bar">
+  <div class="trust-item"><span class="trust-dot"></span>Security-by-Design</div>
+  <div class="trust-item"><span class="trust-dot"></span>Role-Based Access Control</div>
+  <div class="trust-item"><span class="trust-dot"></span>Human-Guided AI</div>
+  <div class="trust-item"><span class="trust-dot"></span>Governance-Ready Architecture</div>
+  <div class="trust-item"><span class="trust-dot"></span>NDA Available on Request</div>
+</div>
+
+</div><!-- /shell -->
+
+<div class="footer-note">
+  &copy; 2026 AEOD Technologies LLC &nbsp;·&nbsp; Selma, Alabama &nbsp;·&nbsp; All rights reserved
+</div>
+
+</div><!-- /page-wrap -->
+
+
+<!-- ═══════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════ -->
+<script>
+/* ═════════════════════════════════════════════════════════════
+   AEOD UNIVERSAL CLIENT ONBOARDING & DISCOVERY SYSTEM v2.0
+   Front-end production-ready shell. Afnan / CAIIO must connect
+   Netlify Functions + Supabase before public submission is enabled.
+   ═════════════════════════════════════════════════════════════ */
+var currentStep = 1;
+var aeodFiles = [];
+var AEOD_DRAFT_KEY = 'aeod_universal_onboarding_v2_draft';
+var AEOD_CONFIG = {
+  // Same-origin Netlify Function endpoints. Leave as-is once deployed on Netlify.
+  initEndpoint: '/.netlify/functions/onboarding-init',
+  fileCompleteEndpoint: '/.netlify/functions/onboarding-file-complete',
+  finalizeEndpoint: '/.netlify/functions/onboarding-finalize',
+  saveDraftEndpoint: '/.netlify/functions/onboarding-save-draft',
+
+  // Public Supabase project info (safe to expose — grants no access by itself,
+  // only used to talk to the Storage signed-upload-URL endpoint).
+  // *** REPLACE THESE TWO VALUES BEFORE DEPLOYING ***
+  supabaseUrl: 'https://jrtpvqnbgbgjsqlsfmjw.supabase.co',
+  supabaseAnonKey: 'sb_publishable_bnOcAx8YUusVGh53NJjC7g_7vQouJb1',
+  storageBucket: 'aeod-onboarding-documents'
+};
+var aeodSupabase = (AEOD_CONFIG.supabaseUrl.indexOf('YOUR-PROJECT-REF') === -1 && window.supabase)
+  ? window.supabase.createClient(AEOD_CONFIG.supabaseUrl, AEOD_CONFIG.supabaseAnonKey)
+  : null;
+
+var stepMeta = {
+  1:{eyebrow:'Step 1 of 4 — Organization & Operating Profile',title:'Universal Client<br>Onboarding',sub:'Tell us who you are, how the organization operates, and where your digital presence lives.'},
+  2:{eyebrow:'Step 2 of 4 — Challenge, Platform & Discovery',title:'What Problem<br>Are We Solving?',sub:'AEOD maps your challenge to the right platform, service stack, and sector-specific discovery path.'},
+  3:{eyebrow:'Step 3 of 4 — AI Readiness, Integration & Decision',title:'How Ready Is<br>Your Organization?',sub:'We assess systems, data, governance, adoption, authority, timeline, and investment readiness.'},
+  4:{eyebrow:'Step 4 of 4 — Documents, Governance & Success',title:'Supporting Materials<br>& Success Vision',sub:'Supporting records and success measures help AEOD design a decision-grade recommendation.'},
+  5:{eyebrow:'Submission Verified',title:'Intake<br>Submitted',sub:'Your onboarding record was accepted by the secure AEOD submission service.'}
+};
+
+function goTo(n){
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  var panel=document.getElementById('panel-'+n);if(panel)panel.classList.add('active');
+  var pct=n>=5?100:Math.round((n/4)*100);document.getElementById('prog').style.width=pct+'%';
+  for(var i=1;i<=4;i++){var dot=document.getElementById('sd'+i),line=document.getElementById('sl'+i);if(!dot)continue;dot.className='step-dot';if(i<n)dot.className='step-dot done';if(i===n&&n<=4)dot.className='step-dot active';if(line)line.className=i<n?'step-line done':'step-line';}
+  var meta=stepMeta[n];if(meta){document.getElementById('hdr-eyebrow').textContent=meta.eyebrow;document.getElementById('hdr-title').innerHTML=meta.title;document.getElementById('hdr-sub').textContent=meta.sub;}
+  document.getElementById('trust-bar').style.display=n===5?'none':'';currentStep=n;window.scrollTo({top:0,behavior:'smooth'});
+}
+function sp(el,groupId){document.querySelectorAll('#'+groupId+' .pill').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
+function spModule(el,groupId){sp(el,groupId);updateDiscoveryModules();}
+function tp(el){el.classList.toggle('sel-multi');}
+function toggleCard(el){el.classList.toggle('sel');}
+function selectedOrgModule(){var el=document.querySelector('#org-type .module-trigger.sel');return el?el.dataset.module:'';}
+function updateDiscoveryModules(){var active=selectedOrgModule();document.querySelectorAll('[data-module-panel]').forEach(p=>p.classList.toggle('active',p.dataset.modulePanel===active));var el=document.getElementById('module-summary');if(!el)return;var selected=document.querySelector('#org-type .module-trigger.sel');el.innerHTML=active?'<strong>Active discovery route:</strong> '+escapeHTML(selected.textContent.trim())+'. AEOD is showing the sector-specific questions that apply to this organization.':'<strong>Universal core active.</strong> Choose the organization type in Step 1 and AEOD will surface the relevant deeper discovery module here.';}
+function escapeHTML(v){return String(v||'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}
+function formatBytes(n){if(!n)return'0 B';var u=['B','KB','MB','GB'],i=Math.min(Math.floor(Math.log(n)/Math.log(1024)),u.length-1);return(n/Math.pow(1024,i)).toFixed(i?1:0)+' '+u[i];}
+function handleFiles(input){setFiles(input.files);}
+function setFiles(files){aeodFiles=[...files];aeodFiles.forEach(f=>{f._status='pending';});renderFileStatus();}
+function initDrop(){var zone=document.querySelector('.upload-zone'),input=document.getElementById('file-input');if(!zone||!input)return;['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.style.borderColor='var(--sky)';}));['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.style.borderColor='';}));zone.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files.length){try{var dt=new DataTransfer();[...e.dataTransfer.files].forEach(f=>dt.items.add(f));input.files=dt.files;}catch(_){}setFiles(e.dataTransfer.files);}});setFiles([]);}
+
+function allControls(){return[...document.querySelectorAll('.cf-body input,.cf-body textarea,.cf-body select')].filter(el=>el.type!=='file');}
+function serializeDraft(){return{savedAt:new Date().toISOString(),currentStep,controls:allControls().map((el,i)=>({i,value:el.value,checked:!!el.checked,type:el.type})),pillStates:[...document.querySelectorAll('.pill')].map((el,i)=>({i,sel:el.classList.contains('sel'),multi:el.classList.contains('sel-multi')})),cardStates:[...document.querySelectorAll('.pcard')].map((el,i)=>({i,sel:el.classList.contains('sel')}))};}
+function saveDraft(){try{localStorage.setItem(AEOD_DRAFT_KEY,JSON.stringify(serializeDraft()));flashUtility('Draft saved on this device');}catch(e){alert('This browser could not save the draft locally. Please print or save a PDF before leaving.');}}
+function restoreDraft(){try{var raw=localStorage.getItem(AEOD_DRAFT_KEY);if(!raw)return;var st=JSON.parse(raw),controls=allControls();(st.controls||[]).forEach(x=>{var el=controls[x.i];if(!el)return;el.value=x.value||'';if(el.type==='checkbox'||el.type==='radio')el.checked=!!x.checked;});var pills=[...document.querySelectorAll('.pill')];(st.pillStates||[]).forEach(x=>{var el=pills[x.i];if(!el)return;el.classList.toggle('sel',!!x.sel);el.classList.toggle('sel-multi',!!x.multi);});var cards=[...document.querySelectorAll('.pcard')];(st.cardStates||[]).forEach(x=>{var el=cards[x.i];if(el)el.classList.toggle('sel',!!x.sel);});currentStep=Math.max(1,Math.min(Number(st.currentStep)||1,4));updateDiscoveryModules();goTo(currentStep);}catch(e){console.warn('Draft restore skipped',e);}}
+function clearDraft(){try{localStorage.removeItem(AEOD_DRAFT_KEY);}catch(e){}}
+function flashUtility(msg){var bar=document.querySelector('.utility-bar');if(!bar)return;var old=document.getElementById('util-msg');if(old)old.remove();var s=document.createElement('span');s.id='util-msg';s.style.cssText='font-size:11px;color:var(--sapphire);font-weight:600;align-self:center';s.textContent='✓ '+msg;bar.prepend(s);setTimeout(()=>s.remove(),2200);}
+
+function pillValues(groupId){return[...document.querySelectorAll('#'+groupId+' .pill.sel,#'+groupId+' .pill.sel-multi')].map(x=>x.textContent.trim());}
+function selectedPlatforms(){return[...document.querySelectorAll('.pcard.sel .pcard-name')].map(x=>x.textContent.trim());}
+function collectData(){
+  var d={schemaVersion:'AEOD_ONBOARDING_V2',capturedAt:new Date().toISOString(),contact:{},organization:{},operations:{},digital:{social:{}},challenge:{},readiness:{},governance:{},documents:[],success:{}};
+  d.contact={name:val('f-name'),title:val('f-title'),email:val('f-email'),phone:val('f-phone'),preferredContact:val('f-contact')};
+  d.organization={name:val('f-org'),website:val('f-web'),cityState:val('f-city'),legalStructure:val('f-legal'),locations:val('f-locations'),primaryLocation:val('f-primary-location'),type:pillValues('org-type')[0]||'',employees:selectByLabel('Number of Employees'),departments:selectByLabel('Number of Departments'),yearsInOperation:selectByLabel('Years in Operation')};
+  d.operations.days=[...document.querySelectorAll('.hours-row')].map(r=>({day:r.querySelector('.day-open').dataset.day,open:r.querySelector('.day-open').checked,start:r.querySelector('.day-start').value,end:r.querySelector('.day-end').value}));d.operations.shifts=val('op-shifts');d.operations.receivingWindow=val('op-receiving');d.operations.timezone=val('op-timezone');d.operations.shiftTimes=val('op-shift-times');d.operations.afterHours=val('op-after-hours');d.operations.scheduleNotes=val('op-schedule-notes');
+  d.digital.website=val('digital-web')||val('f-web');d.digital.manager=val('digital-owner');document.querySelectorAll('[data-social]').forEach(cb=>{if(cb.checked){var key=cb.dataset.social,u=document.querySelector('[data-social-url="'+key+'"]');d.digital.social[key]=u?u.value:'';}});d.digital.other=val('digital-other');
+  d.challenge.primary=pillValues('challenge')[0]||'';d.challenge.description=textareaByPlaceholder('Walk us through the problem');d.challenge.platforms=selectedPlatforms();d.challenge.services=pillValues('services');d.challenge.discoveryModule=selectedOrgModule();d.challenge.discoveryResponses=[...document.querySelectorAll('.discovery-module.active input')].map(i=>({question:i.previousElementSibling?i.previousElementSibling.textContent.trim():'',answer:i.value})).filter(x=>x.answer);
+  d.readiness.techStack=pillValues('tech-stack');d.readiness.integrationSystems=val('integration-systems');d.readiness.automationFirst=val('automation-first');d.readiness.aiExperience=selectByLabel('Has your team used AI tools before?');d.readiness.leadershipAlignment=selectByLabel('Is leadership aligned on AI adoption?');d.readiness.processDocumentation=selectByLabel('Are your current processes documented?');d.readiness.dataOrganization=selectByLabel('How is your data currently organized?');d.readiness.timeline=pillValues('timeline')[0]||'';d.readiness.budget=pillValues('budget')[0]||'';d.readiness.decisionRole=pillValues('decision')[0]||'';d.readiness.approvalRequiredFrom=selectByLabel('Approval required from');d.readiness.nextStep=pillValues('nextstep')[0]||'';
+  d.governance.ndaStatus=val('nda-status');d.governance.securityContact=val('security-contact');d.governance.dataTypes=pillValues('data-types');d.governance.policies=pillValues('gov-policies');
+  d.documents=aeodFiles.map(f=>({name:f.name,size:f.size,type:f.type}));
+  d.success.ninetyDay=textareaByLabel('What does success look like 90 days after working with AEOD?');d.success.other=textareaByLabel('Is there anything else AEOD should know before your discovery call?');
+  return d;
+}
+function val(id){var el=document.getElementById(id);return el?String(el.value||'').trim():'';}
+function selectByLabel(txt){var lab=[...document.querySelectorAll('.field label')].find(l=>l.textContent.trim()===txt);var el=lab?lab.parentElement.querySelector('select,input,textarea'):null;return el?String(el.value||'').trim():'';}
+function textareaByLabel(txt){var lab=[...document.querySelectorAll('.field label')].find(l=>l.textContent.trim()===txt);var el=lab?lab.parentElement.querySelector('textarea'):null;return el?String(el.value||'').trim():'';}
+function textareaByPlaceholder(txt){var el=[...document.querySelectorAll('textarea')].find(t=>(t.placeholder||'').includes(txt));return el?String(el.value||'').trim():'';}
+
+function validateMinimum(){var missing=[];[['f-name','Full Name'],['f-title','Title / Role'],['f-org','Organization Name'],['f-email','Email Address']].forEach(x=>{if(!val(x[0]))missing.push(x[1]);});if(!selectedOrgModule())missing.push('Organization Type');if(!pillValues('challenge').length)missing.push('Primary Challenge');return missing;}
+
+var aeodSubmissionId = null;
+
+function setSubmitButtonState(disabled, label){
+  var btn = document.querySelector('#panel-4 .btn-sky');
+  if(!btn) return;
+  btn.disabled = disabled;
+  btn.style.opacity = disabled ? '0.6' : '1';
+  btn.style.cursor = disabled ? 'default' : 'pointer';
+  if(label) btn.innerHTML = label;
+}
+
+function renderFileStatus(){
+  var list=document.getElementById('file-list');
+  if(!list) return;
+  if(!aeodFiles.length){ list.innerHTML='<div style="font-size:11px;color:var(--slate)">No files selected.</div>'; return; }
+  list.innerHTML = aeodFiles.map(function(f){
+    var status = f._status || 'pending';
+    var color = status==='verified' ? '#1a8a4c' : (status==='failed' ? '#c0392b' : 'var(--sapphire)');
+    var label = status==='verified' ? 'Uploaded ✓' : (status==='failed' ? 'Failed — will retry' : (status==='uploading' ? 'Uploading…' : 'Queued'));
+    return '<div class="file-item">📄 <span class="fname">'+escapeHTML(f.name)+'</span><span class="fsize">'+formatBytes(f.size)+'</span>'+
+      '<span style="font-size:10px;font-weight:700;color:'+color+'">'+label+'</span></div>';
+  }).join('');
+}
+
+async function uploadOneFile(fileMeta, uploadDescriptor){
+  fileMeta._status = 'uploading'; renderFileStatus();
+  if(!aeodSupabase) throw new Error('Supabase client is not configured on this page yet.');
+
+  var { error: uploadErr } = await aeodSupabase.storage
+    .from(AEOD_CONFIG.storageBucket)
+    .uploadToSignedUrl(uploadDescriptor.path, uploadDescriptor.token, fileMeta);
+  if(uploadErr) { fileMeta._status='failed'; renderFileStatus(); throw uploadErr; }
+
+  var res = await fetch(AEOD_CONFIG.fileCompleteEndpoint, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ submissionId: aeodSubmissionId, fileId: uploadDescriptor.fileId })
+  });
+  var result = await res.json().catch(()=>({ok:false}));
+  if(!res.ok || result.ok===false){ fileMeta._status='failed'; renderFileStatus(); throw new Error(result.message || 'File verification failed'); }
+
+  fileMeta._status='verified'; renderFileStatus();
+}
+
+async function submitIntake(){
+  var missing=validateMinimum();
+  if(missing.length){ alert('Please complete the required onboarding fields before submission: '+missing.join(', ')); return; }
+
+  saveDraft();
+  var payload=collectData();
+
+  if(!aeodSupabase){
+    // Frontend foundation only — backend not yet connected on this deployment.
+    // Per the CEO directive, we never claim a successful submission without verification.
+    document.getElementById('confirmation-title').textContent='Onboarding Complete — Secure Endpoint Required';
+    document.getElementById('confirmation-message').innerHTML='Your responses are complete and saved on this device, but this build does not yet have the Netlify + Supabase submission endpoint connected (see AEOD_CONFIG at the top of the script). The system will not falsely report a submission. Use <strong>Print / Save PDF</strong> for review until the production integration is complete.';
+    goTo(5);
+    return;
+  }
+
+  setSubmitButtonState(true, 'Submitting…');
+
+  try{
+    // 1. Init: validate + create client/submission/response rows, get signed upload URLs
+    var initRes = await fetch(AEOD_CONFIG.initEndpoint, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ payload: payload, fileManifest: aeodFiles.map(f=>({name:f.name,type:f.type,size:f.size})) })
+    });
+    var initResult = await initRes.json().catch(()=>({ok:false}));
+    if(!initRes.ok || initResult.ok===false) throw new Error(initResult.message || 'Could not start the secure submission.');
+
+    aeodSubmissionId = initResult.submissionId;
+    var uploads = initResult.uploads || [];
+
+    // 2. Upload each file directly to private Supabase Storage via signed URL, then verify
+    for(var i=0;i<uploads.length;i++){
+      var descriptor = uploads[i];
+      var fileMeta = aeodFiles.find(f=>f.name===descriptor.originalName) || aeodFiles[i];
+      await uploadOneFile(fileMeta, descriptor);
+    }
+
+    // 3. Finalize: only after every file is verified does this call succeed
+    var finalRes = await fetch(AEOD_CONFIG.finalizeEndpoint, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ submissionId: aeodSubmissionId })
+    });
+    var finalResult = await finalRes.json().catch(()=>({ok:false}));
+    if(!finalRes.ok || finalResult.ok===false) throw new Error(finalResult.message || 'Submission could not be verified.');
+
+    clearDraft();
+    document.getElementById('confirmation-title').textContent='Intake Submitted';
+    document.getElementById('confirmation-message').textContent='Thank you. Your AEOD onboarding record has been securely received and verified for review.';
+    setSubmitButtonState(false, 'Submit Intake &#8594;');
+    goTo(5);
+  }catch(err){
+    console.error('AEOD submission error', err);
+    setSubmitButtonState(false, 'Submit Intake &#8594;');
+    alert('The secure submission could not be verified: '+(err.message||'unknown error')+'. Your draft remains saved on this device. Please retry, or use Print / Save PDF and contact AEOD.');
+  }
+}
+
+function openPrintModal(){document.getElementById('pdf-overlay').classList.add('active');}
+function closePrintModal(){document.getElementById('pdf-overlay').classList.remove('active');}
+function doPrint(){closePrintModal();var target=document.getElementById('print-summary');target.innerHTML=buildPrintSummary();var old=currentStep;document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-print').classList.add('active');setTimeout(()=>{window.print();document.getElementById('panel-print').classList.remove('active');goTo(old);},180);}
+function fieldRow(k,v){if(v===undefined||v===null||v===''||(Array.isArray(v)&&!v.length))return'';if(typeof v==='object'&&!Array.isArray(v))v=Object.entries(v).map(([a,b])=>a+': '+b).join('; ');if(Array.isArray(v))v=v.map(x=>typeof x==='object'?JSON.stringify(x):x).join('; ');return'<div style="display:grid;grid-template-columns:180px 1fr;gap:12px;padding:6px 0;border-bottom:1px solid #e6ebf1"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6e85a1">'+escapeHTML(k)+'</div><div style="font-size:12px;color:#0A1C35">'+escapeHTML(v)+'</div></div>';}
+function section(title,rows){var body=rows.filter(Boolean).join('');return body?'<section style="margin:0 0 22px;page-break-inside:avoid"><div style="background:#0A1C35;color:#3BA8F0;font:700 11px Barlow,sans-serif;letter-spacing:2px;text-transform:uppercase;padding:7px 10px;border-radius:4px">'+escapeHTML(title)+'</div>'+body+'</section>':'';}
+function buildPrintSummary(){var d=collectData(),openDays=d.operations.days.filter(x=>x.open).map(x=>x.day+(x.start?' '+x.start:'')+(x.end?'–'+x.end:'')).join(', ');return'<div style="font-family:Barlow,Arial,sans-serif;color:#0A1C35;padding:28px"><div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #3BA8F0;padding-bottom:12px;margin-bottom:22px"><div><div style="font:900 28px Barlow Condensed,Arial,sans-serif">AEOD TECHNOLOGIES</div><div style="font-size:10px;letter-spacing:3px;color:#1558A8;text-transform:uppercase">Universal Client Onboarding & Discovery Record</div></div><div style="text-align:right;font-size:10px;color:#8FA5C0">'+new Date().toLocaleDateString()+'<br>Confidential Client Record</div></div>'+section('Client & Organization',[fieldRow('Contact',d.contact.name+' — '+d.contact.title),fieldRow('Organization',d.organization.name),fieldRow('Email',d.contact.email),fieldRow('Phone',d.contact.phone),fieldRow('Organization Type',d.organization.type),fieldRow('Legal Structure',d.organization.legalStructure),fieldRow('Primary Location',d.organization.primaryLocation)])+section('Operating Profile',[fieldRow('Days / Hours',openDays),fieldRow('Shifts',d.operations.shifts),fieldRow('Shift Times',d.operations.shiftTimes),fieldRow('Receiving / Service Window',d.operations.receivingWindow),fieldRow('Timezone',d.operations.timezone),fieldRow('Schedule Notes',d.operations.scheduleNotes)])+section('Digital Presence',[fieldRow('Website',d.digital.website),fieldRow('Digital Manager',d.digital.manager),fieldRow('Social Profiles',d.digital.social),fieldRow('Other Channels',d.digital.other)])+section('Challenge & AEOD Fit',[fieldRow('Primary Challenge',d.challenge.primary),fieldRow('Challenge Description',d.challenge.description),fieldRow('Platforms',d.challenge.platforms),fieldRow('Services',d.challenge.services),fieldRow('Discovery Module',d.challenge.discoveryModule),fieldRow('Discovery Responses',d.challenge.discoveryResponses.map(x=>x.question+': '+x.answer))])+section('AI Readiness & Decision',[fieldRow('Technology Stack',d.readiness.techStack),fieldRow('Systems / Integrations',d.readiness.integrationSystems),fieldRow('Automate First',d.readiness.automationFirst),fieldRow('AI Experience',d.readiness.aiExperience),fieldRow('Leadership Alignment',d.readiness.leadershipAlignment),fieldRow('Process Documentation',d.readiness.processDocumentation),fieldRow('Data Organization',d.readiness.dataOrganization),fieldRow('Timeline',d.readiness.timeline),fieldRow('Investment Range',d.readiness.budget),fieldRow('Decision Role',d.readiness.decisionRole),fieldRow('Approval Required From',d.readiness.approvalRequiredFrom),fieldRow('Preferred Next Step',d.readiness.nextStep)])+section('Governance, Documents & Success',[fieldRow('NDA Status',d.governance.ndaStatus),fieldRow('Data Types',d.governance.dataTypes),fieldRow('Policies',d.governance.policies),fieldRow('Files Selected',d.documents.map(x=>x.name+' ('+formatBytes(x.size)+')')),fieldRow('90-Day Success',d.success.ninetyDay),fieldRow('Additional Context',d.success.other)])+'<div style="margin-top:26px;border-top:1px solid #DDE3EC;padding-top:10px;font-size:9px;color:#8FA5C0;display:flex;justify-content:space-between"><span>AEOD Technologies LLC · aeodai.com · info@aeodai.com</span><span>Human-guided AI · Confidential client onboarding record</span></div></div>';}
+
+initDrop();restoreDraft();updateDiscoveryModules();
+</script>
+
+
+<div class="pdf-overlay" id="pdf-overlay">
+  <div class="pdf-modal">
+    <h3>Print / Save Your AEOD Onboarding Record</h3>
+    <p>A complete AEOD-branded summary of the current responses will open in the browser print dialog. Choose <strong>Save as PDF</strong> to create a digital copy.</p>
+    <div style="display:flex;gap:9px;justify-content:center;flex-wrap:wrap"><button class="btn btn-sky" type="button" onclick="doPrint()">🖨 Print / Save PDF</button><button class="btn btn-ghost" type="button" onclick="closePrintModal()">Cancel</button></div>
+  </div>
+</div>
+
+</body>
+</html>

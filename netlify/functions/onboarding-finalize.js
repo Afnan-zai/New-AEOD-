@@ -16,14 +16,42 @@ exports.handler = async (event) => {
   const supabase = getAdminClient();
 
   try {
+    // 1. Fetch the submission (no joins — avoids PostgREST relationship resolution issues)
     const { data: submission, error: subErr } = await supabase
       .from('onboarding_submissions')
-      .select('*, clients(*), client_contacts(*)')
+      .select('*')
       .eq('id', submissionId)
       .single();
-    if (subErr || !submission) return jsonResponse(404, { ok: false, message: 'Submission not found' });
+    if (subErr || !submission) {
+      console.error('finalize: submission fetch failed', subErr);
+      return jsonResponse(404, { ok: false, message: 'Submission not found' });
+    }
 
-    // Every file attached to this submission must be verified (not merely "uploaded").
+    // 2. Fetch the related client and its contacts separately
+    let clientRow = null;
+    let contacts = [];
+    if (submission.client_id) {
+      const { data: c } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('id', submission.client_id)
+        .maybeSingle();
+      clientRow = c || null;
+
+      const { data: cc } = await supabase
+        .from('client_contacts')
+        .select('*')
+        .eq('client_id', submission.client_id);
+      contacts = cc || [];
+    }
+
+    const submissionWithClient = {
+      ...submission,
+      clients: clientRow,
+      client_contacts: contacts
+    };
+
+    // 3. Every file attached to this submission must be verified (not merely "uploaded").
     const { data: files, error: filesErr } = await supabase
       .from('onboarding_files')
       .select('id, upload_status, original_name')
@@ -38,6 +66,7 @@ exports.handler = async (event) => {
       });
     }
 
+    // 4. Mark the submission as submitted
     const now = new Date().toISOString();
     const { error: updErr } = await supabase
       .from('onboarding_submissions')
@@ -45,6 +74,7 @@ exports.handler = async (event) => {
       .eq('id', submissionId);
     if (updErr) throw updErr;
 
+    // 5. Audit event
     await supabase.from('onboarding_events').insert({
       submission_id: submissionId,
       event_type: 'submitted',
@@ -52,9 +82,8 @@ exports.handler = async (event) => {
       details_json: { fileCount: (files || []).length }
     });
 
-    // Optional internal notification (fires only after verified finalization).
-    // No sensitive files are attached — just identifying/routing info + a review link.
-    await maybeSendNotification(submission, submissionId, files || []);
+    // 6. Optional internal notification (fires only after verified finalization).
+    await maybeSendNotification(submissionWithClient, submissionId, files || []);
 
     return jsonResponse(200, { ok: true, submissionId, status: 'submitted' });
   } catch (err) {
